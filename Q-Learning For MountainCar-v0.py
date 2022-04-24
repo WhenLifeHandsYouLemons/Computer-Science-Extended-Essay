@@ -15,13 +15,13 @@ env.reset()
 VARIABLES
 """
 # To get an average as it varies largely
-average_runs = 5
+average_runs = 25
 # How much does it care about what it just learnt
 learning_rate = 0.5
 # How much does it care about the future
-discount_rate = 0.1
+discount_rate = 0.3
 # How greedy is the agent
-greedy_action = 0.5
+greedy_action = 0.25
 # Until how much does the greediness decrease
 minimum_greed = 0
 # How much is the greediness factor divided by
@@ -33,6 +33,7 @@ consecutive_wins = 3
 """
 Run Q-Learning Algorithm
 """
+print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 runs = 0
 episodes = []
 while runs < average_runs:
@@ -91,7 +92,7 @@ while runs < average_runs:
             # End agent if they reach the goal
             if done and state2[0] >= 0.5:
                 running_win += 1
-                # print(f"This agent won {running_win} times in a row!")
+                print(f"This agent won {running_win} times in a row!")
                 Q[state_adj[0], state_adj[1], action] = reward
 
             # Adjust Q value for current state
@@ -106,8 +107,8 @@ while runs < average_runs:
         if ga > mg:
             ga -= reduction
 
-        # if (total_episodes+1) % 100 == 0:
-        #     print(f"Episode {total_episodes+1}")
+        if (total_episodes+1) % 100 == 0:
+            print(f"Episode {total_episodes+1}")
 
         total_episodes += 1
 
@@ -117,21 +118,9 @@ while runs < average_runs:
     runs += 1
 
 print("\nThe number of episodes per run:")
-i = 1
-for runs in episodes:
-    print(f"Run {i}: {runs} episodes")
-    i += 1
+i = 0
+while i != len(episodes):
+    avg = (episodes[i] + episodes[i+1] + episodes[i+2] + episodes[i+3] + episodes[i+4]) / 5
+    print(f"Run {round(i/5) + 1}: {avg} episodes")
+    i += 5
 print(f"\nAverage out of {average_runs} runs: {np.mean(episodes)} episodes")
-
-
-
-
-
-# Plot Rewards
-# plt.plot(100*(np.arange(len(rewards)) + 1), rewards)
-# plt.xlabel('Episodes')
-# plt.ylabel('Average Reward')
-# plt.title('Average Reward vs Episodes')
-# # plt.savefig('rewards.jpg')
-# plt.show()
-# plt.close()

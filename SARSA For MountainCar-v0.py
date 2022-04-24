@@ -15,7 +15,7 @@ env.reset()
 VARIABLES
 """
 # To get an average as it varies largely
-average_runs = 5
+average_runs = 0
 # How much does it care about what it just learnt
 learning_rate = 0.5
 # How much does it care about the future

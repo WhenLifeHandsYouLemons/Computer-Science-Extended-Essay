@@ -19,11 +19,11 @@ runs_per_trials = 5
 # Number of trials
 trials = 5
 # Maximum episodes allowed
-maximum_episodes = 3000
+maximum_episodes = 2000
 # How much does it care about what it just learnt
-learning_rate = 0.5
+learning_rate = 0.1
 # How much does it care about the future
-discount_rate = 0.4
+discount_rate = 0.85
 # How greedy is the agent
 greedy_action = 0.25
 # Until how much does the greediness decrease

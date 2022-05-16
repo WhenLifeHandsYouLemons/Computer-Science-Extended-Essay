@@ -1,10 +1,8 @@
 """
 Imports & Initialise
 """
-# import time
 import numpy as np
 import gym
-# import matplotlib.pyplot as plt
 
 # Initialize Mountain Car Environment
 env = gym.make('MountainCar-v0')
@@ -14,12 +12,16 @@ env.reset()
 """
 VARIABLES
 """
-# To get an average as it varies largely
-average_runs = 0
+# Runs per trial
+runs_per_trials = 5
+# Number of trials
+trials = 5
+# Maximum episodes allowed
+maximum_episodes = 2000
 # How much does it care about what it just learnt
 learning_rate = 0.5
 # How much does it care about the future
-discount_rate = 0.65
+discount_rate = 0.45
 # How greedy is the agent
 greedy_action = 0.25
 # Until how much does the greediness decrease
@@ -31,12 +33,13 @@ consecutive_wins = 3
 
 
 """
-Run Q-Learning Algorithm
+Run SARSA Algorithm
 """
 print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 runs = 0
 episodes = []
-while runs < average_runs:
+total_runs = runs_per_trials * trials
+while runs < total_runs:
     # Reset variables
     lr = learning_rate
     dr = discount_rate
@@ -44,8 +47,9 @@ while runs < average_runs:
     mg = minimum_greed
     gdf = greediness_decrease_factor
 
-    print(f"Run number: {runs+1}")
+    print(f"\nRun number: {runs+1}")
 
+    ## Initialisation
     # Determine size of discretized state space
     num_states = (env.observation_space.high - env.observation_space.low) *\
         np.array([10, 100])
@@ -61,8 +65,9 @@ while runs < average_runs:
     total_episodes = 0
     running_win = 0
 
-    # Run Q learning algorithm
-    while state2[0] < 0.5 or running_win != consecutive_wins:
+    # Run SARSA algorithm
+    while running_win != consecutive_wins:
+        ## Initialise state S by resetting the environment
         # Initialize parameters
         done = False
         state = env.reset()
@@ -71,13 +76,16 @@ while runs < average_runs:
         state_adj = (state - env.observation_space.low) * np.array([10, 100])
         state_adj = np.round(state_adj, 0).astype(int)
 
-        while not done:
-            # Determine next action - epsilon greedy strategy
-            if np.random.random() < 1 - ga:
-                action = np.argmax(Q[state_adj[0], state_adj[1]])
-            else:
-                action = np.random.randint(0, env.action_space.n)
 
+        ## Choose action A from S using epsilon-greedy policy derived from Q
+        # Determine next action - epsilon greedy strategy
+        if np.random.random() < ga:
+            action = np.random.randint(0, env.action_space.n)
+        else:
+            action = np.argmax(Q[state_adj[0], state_adj[1]])
+
+        while not done:
+            ## Take action A, then observe reward R and next state S'
             # Get next state and reward
             state2, reward, done, info = env.step(action)
 
@@ -85,23 +93,28 @@ while runs < average_runs:
             state2_adj = (state2 - env.observation_space.low) * np.array([10, 100])
             state2_adj = np.round(state2_adj, 0).astype(int)
 
-            # End agent if they take too long
+            # If the agent takes too long
             if done and state2[0] < 0.5:
                 running_win = 0
 
-            # End agent if they reach the goal
+            # If the agent reaches the goal
             if done and state2[0] >= 0.5:
                 running_win += 1
                 print(f"This agent won {running_win} times in a row!")
-                Q[state_adj[0], state_adj[1], action] = reward
 
-            # Adjust Q value for current state
+            ## Choose action A' from S' using epsilon-greedy policy derived from Q
+            # Determine next action - epsilon greedy strategy
+            if np.random.random() < ga:
+                action2 = np.random.randint(0, env.action_space.n)
             else:
-                # Updating the Q-value in the Q-table using the Bellman equation
-                Q[state_adj[0], state_adj[1], action] = Q[state_adj[0], state_adj[1], action] + lr * (reward + dr * np.max(Q[state2_adj[0], state2_adj[1]]) - Q[state_adj[0], state_adj[1],action])
+                action2 = np.argmax(Q[state2_adj[0], state2_adj[1]])
+
+            # Updating the Q-value in the Q-table using the Bellman equation
+            Q[state_adj[0], state_adj[1], action] = Q[state_adj[0], state_adj[1], action] + lr * (reward + dr * Q[state2_adj[0], state2_adj[1], action] - Q[state_adj[0], state_adj[1],action])
 
             # Make next state and action as current state and action
             state_adj = state2_adj
+            action = action2
 
         # Decay epsilon
         if ga > mg:
@@ -110,29 +123,33 @@ while runs < average_runs:
         if (total_episodes+1) % 100 == 0:
             print(f"Episode {total_episodes+1}")
 
+        if total_episodes > maximum_episodes:
+            running_win = consecutive_wins
+
         total_episodes += 1
 
     env.close()
-    print()
     episodes.append(total_episodes)
     runs += 1
 
+"""
+Print Final Results
+"""
 print("\nThe number of episodes per run:")
-i = 1
-for runs in episodes:
-    print(f"Run {i}: {runs} episodes")
-    i += 1
-print(f"\nAverage out of {average_runs} runs: {np.mean(episodes)} episodes")
 
+i = 0
+avg_episodes = []
+while i != len(episodes):
+    j = 0
+    avg = 0
+    while j != runs_per_trials - 1:
+        avg += episodes[i+j]
+        j += 1
+    avg /= 5
 
+    print(f"Run {round(i / runs_per_trials) + 1}: {avg} episodes")
+    avg_episodes.append(avg)
 
+    i += runs_per_trials
 
-
-# Plot Rewards
-# plt.plot(100*(np.arange(len(rewards)) + 1), rewards)
-# plt.xlabel('Episodes')
-# plt.ylabel('Average Reward')
-# plt.title('Average Reward vs Episodes')
-# # plt.savefig('rewards.jpg')
-# plt.show()
-# plt.close()
+print(f"\nAverage out of {total_runs} runs: {np.mean(avg_episodes)} episodes\n\n\n\n\n")

@@ -1,10 +1,8 @@
 """
 Imports & Initialise
 """
-# import time
 import numpy as np
 import gym
-# import matplotlib.pyplot as plt
 
 # Initialize Mountain Car Environment
 env = gym.make('MountainCar-v0')
@@ -21,7 +19,7 @@ trials = 5
 # Maximum episodes allowed
 maximum_episodes = 2000
 # How much does it care about what it just learnt
-learning_rate = 0.1
+learning_rate = 0.9
 # How much does it care about the future
 discount_rate = 0.85
 # How greedy is the agent
@@ -35,7 +33,7 @@ consecutive_wins = 3
 
 
 """
-Train Q-Learning Algorithm
+Run Q-Learning Algorithm
 """
 print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 runs = 0
@@ -51,6 +49,7 @@ while runs < total_runs:
 
     print(f"\nRun number: {runs+1}")
 
+    ## Initialisation
     # Determine size of discretized state space
     num_states = (env.observation_space.high - env.observation_space.low) *\
         np.array([10, 100])
@@ -66,8 +65,9 @@ while runs < total_runs:
     total_episodes = 0
     running_win = 0
 
-    # Run Q learning algorithm
+    # Run Q-learning algorithm
     while running_win != consecutive_wins:
+        ## Initialise state S by resetting the environment
         # Initialize parameters
         done = False
         state = env.reset()
@@ -77,12 +77,14 @@ while runs < total_runs:
         state_adj = np.round(state_adj, 0).astype(int)
 
         while not done:
+            ## Choose action A from S using epsilon-greedy policy derived from Q
             # Determine next action - epsilon greedy strategy
             if np.random.random() < ga:
                 action = np.random.randint(0, env.action_space.n)
             else:
                 action = np.argmax(Q[state_adj[0], state_adj[1]])
 
+            ## Take action A, then observe reward R and next state S'
             # Get next state and reward
             state2, reward, done, info = env.step(action)
 
@@ -141,4 +143,4 @@ while i != len(episodes):
 
     i += runs_per_trials
 
-print(f"\nAverage out of {total_runs} runs: {np.mean(avg_episodes)} episodes")
+print(f"\nAverage out of {total_runs} runs: {np.mean(avg_episodes)} episodes\n\n\n\n\n")

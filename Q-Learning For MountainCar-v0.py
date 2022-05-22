@@ -19,7 +19,7 @@ trials = 5
 # Maximum episodes allowed
 maximum_episodes = 2000
 # How much does it care about what it just learnt
-learning_rate = 0.9
+learning_rate = 0.5
 # How much does it care about the future
 discount_rate = 0.85
 # How greedy is the agent

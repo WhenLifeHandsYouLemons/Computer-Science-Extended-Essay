@@ -1,4 +1,9 @@
 # https://github.com/viniciusenari/Q-Learning-and-SARSA-Mountain-Car-v0/blob/main/train_qlearning.py for part of the code
+# Running Requirements:
+# Windows 10 or above
+# Python 3.9.6
+# "gym" and "numpy" PIP package
+
 """
 Imports & Initialise
 """

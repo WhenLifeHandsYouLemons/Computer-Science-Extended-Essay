@@ -41,7 +41,6 @@ consecutive_wins = 3
 """
 Run Q-Learning Algorithm
 """
-print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
 runs = 0
 episodes = []
 total_runs = runs_per_trials * trials

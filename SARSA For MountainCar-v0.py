@@ -52,10 +52,9 @@ while runs < total_runs:
     mg = minimum_greed
     gdf = greediness_decrease_factor
 
-    # print(f"\nRun number: {runs+1}")
+    print(f"\nRun number: {runs+1}")
 
-    ## Initialisation
-    # Determine size of discretized state space
+    # Determine size of simplified state table
     num_states = (env.observation_space.high - env.observation_space.low) *\
         np.array([10, 100])
     num_states = np.round(num_states, 0).astype(int) + 1
@@ -63,7 +62,7 @@ while runs < total_runs:
     # Initialize Q table
     Q = np.random.uniform(low=-1, high=1, size=(num_states[0], num_states[1], env.action_space.n))
 
-    # Calculate episodic reduction in epsilon
+    # Calculate change in epsilon for each episode
     reduction = (ga - mg) / gdf
 
     state2 = [0]
@@ -72,17 +71,16 @@ while runs < total_runs:
 
     # Run SARSA algorithm
     while running_win != consecutive_wins:
-        ## Initialise state S by resetting the environment
-        # Initialize parameters
+        # Initialise state S by resetting the environment
         done = False
         state = env.reset()
 
-        # Discretize "simplify" state
+        # Simplify state
         state_adj = (state - env.observation_space.low) * np.array([10, 100])
         state_adj = np.round(state_adj, 0).astype(int)
 
 
-        ## Choose action A from S using epsilon-greedy policy derived from Q
+        # Choose action A from S using epsilon-greedy policy from Q
         # Determine next action - epsilon greedy strategy
         if np.random.random() < ga:
             action = np.random.randint(0, env.action_space.n)
@@ -90,11 +88,11 @@ while runs < total_runs:
             action = np.argmax(Q[state_adj[0], state_adj[1]])
 
         while not done:
-            ## Take action A, then observe reward R and next state S'
+            # Take action A, then observe reward R and next state S'
             # Get next state and reward
             state2, reward, done, info = env.step(action)
 
-            # Discretize "simplify" state2
+            # Simplify state2
             state2_adj = (state2 - env.observation_space.low) * np.array([10, 100])
             state2_adj = np.round(state2_adj, 0).astype(int)
 
@@ -105,9 +103,9 @@ while runs < total_runs:
             # If the agent reaches the goal
             if done and state2[0] >= 0.5:
                 running_win += 1
-                # print(f"This agent won {running_win} times in a row!")
+                print(f"This agent won {running_win} times in a row!")
 
-            ## Choose action A' from S' using epsilon-greedy policy derived from Q
+            # Choose action A' from S' using epsilon-greedy policy from Q
             # Determine next action - epsilon greedy strategy
             if np.random.random() < ga:
                 action2 = np.random.randint(0, env.action_space.n)
@@ -125,8 +123,8 @@ while runs < total_runs:
         if ga > mg:
             ga -= reduction
 
-        # if (total_episodes+1) % 100 == 0:
-        #     print(f"Episode {total_episodes+1}")
+        if (total_episodes+1) % 100 == 0:
+            print(f"Episode {total_episodes+1}")
 
         if total_episodes > maximum_episodes:
             running_win = consecutive_wins
@@ -157,4 +155,4 @@ while i != len(episodes):
 
     i += runs_per_trials
 
-print(f"\nAverage out of {total_runs} runs: {np.mean(avg_episodes)} episodes\n\n\n\n\n")
+print(f"\nAverage out of {total_runs} runs: {np.mean(avg_episodes)} episodes\n")
